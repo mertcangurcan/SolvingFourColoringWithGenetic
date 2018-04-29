@@ -40,5 +40,16 @@ def fitness_function(region_groups, neighborhood_matrix):
 						fitness_score[regions] -= 10
 					if(region_groups[regions][i] != region_groups[regions][j]):
 						fitness_score[regions] += 10
-	return fitness_score
-	
+	sorted_indexes = np.argsort(fitness_score)
+	np.argsort(fitness_score)
+	return fitness_score, sorted_indexes
+
+# One point crossover
+def one_point_crossover(sorted_indexes, region_groups):
+	split_point = np.random.randint(1,len(region_groups[0]))
+	# 2 4 
+	cross_part_1 = region_groups[sorted_indexes[1]]
+	cross_part_2 = region_groups[sorted_indexes[3]]
+	region_groups.append(np.concatenate([cross_part_1[:split_point],cross_part_2[split_point:]]))
+	region_groups.append(np.concatenate([cross_part_2[:split_point:],cross_part_1[split_point:]]))
+	return region_groups
