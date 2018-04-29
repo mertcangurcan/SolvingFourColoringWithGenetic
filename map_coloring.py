@@ -27,20 +27,17 @@ def create_region_groups(num_of_elements, num_of_regions):
 	return region_groups
 
 # Calculating fitness gradres for each region set
-def fitness_function(region_groups, neighborhood_matrix):
-	fitness_score = [0] * len(region_groups)
+def calculate_fitness(regions_set, neighborhood_matrix):
+	fitness_score = 0
 	neighborhood = neighborhood_matrix
-	for regions in range(len(region_groups)):
-		for i in range(len(neighborhood[0])):
-			for j in range(i+1, len(neighborhood)):
-				if(neighborhood[i][j] == 1):
-					if region_groups[regions][i] == region_groups[regions][j]:
-						fitness_score[regions] -= 10
-					if region_groups[regions][i] != region_groups[regions][j]:
-						fitness_score[regions] += 10
-	sorted_indexes = np.argsort(fitness_score)
-	np.argsort(fitness_score)
-	return fitness_score, sorted_indexes
+	for i in range(len(neighborhood[0])):
+		for j in range(i+1, len(neighborhood)):
+			if(neighborhood[i][j] == 1):
+				if regions_set[i] == regions_set[j]:
+					fitness_score -= 10
+				if regions_set[i] != regions_set[j]:
+					fitness_score += 10
+	return fitness_score
 
 # One point crossover
 def one_point_crossover(first_set, second_set):
@@ -81,3 +78,4 @@ def uniform_crossover(first_set, second_set, delimeter):
 		if chance <= delimeter:
 			first_set[i], second_set[i] = second_set[i], first_set[i]
 	return first_set, second_set
+
