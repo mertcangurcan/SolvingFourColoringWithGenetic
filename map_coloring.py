@@ -62,8 +62,6 @@ def mutation(region_groups, mutation_delimeter):
 		mutated_set[random_index] = random_color
 		region_groups.append(mutated_set)
 		
-		
-
 # crossover with multipoints between two set
 def multi_point_crossover(first_set, second_set):
 	spoint_1 = np.random.randint(1,len(first_set))
@@ -76,12 +74,16 @@ def multi_point_crossover(first_set, second_set):
 	first_set[spoint_1:spoint_2], second_set[spoint_1:spoint_2] \
 		= second_set[spoint_1:spoint_2], first_set[spoint_1:spoint_2]
 	return first_set, second_set
+
+# crossover with randomly selected indexes
 def uniform_crossover(first_set, second_set, delimeter):
 	chance = np.random.randint(0, 100)
 	for i in range(len(first_set)):
 		if chance <= delimeter:
 			first_set[i], second_set[i] = second_set[i], first_set[i]
 	return first_set, second_set
+
+# drawing regions as graphs and edges
 def draw_regions(result_node, neighborhood):
 	color_map = [None] * len(result_node)
 	np.array(color_map)
@@ -107,7 +109,13 @@ def draw_regions(result_node, neighborhood):
 	nx.draw(gr, node_size=500, node_color = color_map, with_labels=True)
 	plt.show()
 
-print(sys.argv)	
+# ----Algorithm running order----
+# 1- initiate population
+# 2- calculate fitness score
+# 3- make selections and crossovers
+# 4- mutation
+# Repeat n steps
+
 num_of_regions, num_of_steps, mutation_chance = int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3])
 region_groups, neighborhood = initiate_population(num_of_regions)
 for i in range(num_of_steps):
