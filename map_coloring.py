@@ -45,7 +45,7 @@ def fitness_function(region_groups, neighborhood_matrix):
 # One point crossover
 def one_point_crossover(first_set, second_set):
 	spoint = np.random.randint(1,len(first_set))
-	# 2 4 
+	# 2 4
 	first_set[spoint:], second_set[spoint:] = second_set[spoint:], first_set[spoint:]
 	return first_set, second_set
 
@@ -67,7 +67,7 @@ def mutatiton(region_groups):
 def multi_point_crossover(first_set, second_set):
 	spoint_1 = np.random.randint(1,len(first_set))
 	spoint_2 = np.random.randint(1, len(first_set) - 1)
-	if spoint_2 >= split_point_1:
+	if spoint_2 >= spoint_1:
 		spoint_2 += 1
 	else: 
 		spoint_1, spoint_2 = spoint_2, spoint_1
@@ -75,11 +75,9 @@ def multi_point_crossover(first_set, second_set):
 	first_set[spoint_1:spoint_2], second_set[spoint_1:spoint_2] \
 		= second_set[spoint_1:spoint_2], first_set[spoint_1:spoint_2]
 	return first_set, second_set
-
-# crossover by chance for each index between two sets
 def uniform_crossover(first_set, second_set, delimeter):
 	chance = np.random.randint(0, 100)
-	for i in range len(first_set):
+	for i in range(len(first_set)):
 		if chance <= delimeter:
-			first_set[i],  second_set[i] = second_set[i], first_set[i]
+			first_set[i], second_set[i] = second_set[i], first_set[i]
 	return first_set, second_set
