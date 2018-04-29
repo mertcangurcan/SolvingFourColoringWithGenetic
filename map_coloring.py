@@ -26,8 +26,6 @@ def create_region_groups(num_of_elements, num_of_regions):
 		region_groups.append(np.random.randint(0, num_of_regions + 1 , num_of_regions))
 	return region_groups
 
-region_groups, neighborhood = initiate_population()
-print_zones(region_groups)
 # Calculating fitness gradres for each region set
 def fitness_function(region_groups, neighborhood_matrix):
 	fitness_score = [0] * len(region_groups)
@@ -45,11 +43,37 @@ def fitness_function(region_groups, neighborhood_matrix):
 	return fitness_score, sorted_indexes
 
 # One point crossover
-def one_point_crossover(sorted_indexes, region_groups):
-	split_point = np.random.randint(1,len(region_groups[0]))
+def one_point_crossover(first_set, second_set):
+	spoint = np.random.randint(1,len(first_set))
 	# 2 4 
-	cross_part_1 = region_groups[sorted_indexes[1]]
-	cross_part_2 = region_groups[sorted_indexes[3]]
-	region_groups.append(np.concatenate([cross_part_1[:split_point],cross_part_2[split_point:]]))
-	region_groups.append(np.concatenate([cross_part_2[:split_point:],cross_part_1[split_point:]]))
-	return region_groups
+	first_set[spoint:], second_set[spoint:] = second_set[spoint:], first_set[spoint:]
+	return first_set, second_set
+
+# 10% chance to mutation of random set
+def mutatiton(region_groups):
+	mutation_delimiter = 10
+	mutation_chance = np.random.randint(0,100)
+	if(mutation_delimiter <= mutation_chance):
+		random_set = np.random.randint(0,len(region_groups))
+		random_index = np.random.randint(0,len(region_groups[0]))
+		random_color = np.random.randint(0,4)
+		mutated_set = region_groups[random_set]
+		mutated_set[random_index] = random_color
+		region_groups.append(mutated_set)
+		
+		
+# crossover with multipoints between two set
+def multi_point_crossover(first_set, second_set):
+	spoint_1 = np.random.randint(1,len(first_set))
+	spoint_2 = np.random.randint(1, len(first_set) - 1)
+	if spoint_2 >= split_point_1:
+		spoint_2 += 1
+	else: 
+		spoint_1, spoint_2 = spoint_2, spoint_1
+	
+	first_set[spoint_1:spoint_2], second_set[spoint_1:spoint_2] \
+		= second_set[spoint_1:spoint_2], first_set[spoint_1:spoint_2]
+	return first_set, second_set
+	
+		
+	
