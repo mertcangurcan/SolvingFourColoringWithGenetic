@@ -10,18 +10,35 @@ def initiate_population():
 	all_adjacencies = []
 	adjacency_matrix = np.random.randint(0,2,(num_of_regions,num_of_regions))
 	np.fill_diagonal(adjacency_matrix,0)
-	region_set = create_region_set(num_of_elements, num_of_regions)
-	return region_set, adjacency_matrix
+	region_groups = create_region_groups(num_of_elements, num_of_regions)
+	return region_groups, adjacency_matrix
 
-def print_zones(region_set):
-	for i in range (0, len(region_set)):
-		for j in range (0, len((region_set[0]))):
-			print("{0}.set Zone {1} color_code : {2}".format(i, j, region_set[i][j]))
-def create_region_set(num_of_elements, num_of_regions):
-	region_set = []
-	for i in range (0, num_of_elements):
-		region_set.append(np.random.randint(0, num_of_regions + 1 , num_of_regions))
-	return region_set
+# printing all color codes for each region
+def print_zones(region_groups):
+	for i in range (len(region_groups)):
+		for j in range (len((region_groups[0]))):
+			print("{0}.set Zone {1} color_code : {2}".format(i, j, region_groups[i][j]))
 
-region_set, neighborhood = initiate_population()
-print_zones(region_set)
+# Creating region groups as randomly colored
+def create_region_groups(num_of_elements, num_of_regions):
+	region_groups = []
+	for i in range (num_of_elements):
+		region_groups.append(np.random.randint(0, num_of_regions + 1 , num_of_regions))
+	return region_groups
+
+region_groups, neighborhood = initiate_population()
+print_zones(region_groups)
+# Calculating fitness gradres for each region set
+def fitness_function(region_groups, neighborhood_matrix):
+	fitness_score = [0] * len(region_groups)
+	neighborhood = neighborhood_matrix
+	for regions in range(len(region_groups)):
+		for i in range(len(neighborhood[0])):
+			for j in range(i+1, len(neighborhood)):
+				if(neighborhood[i][j] == 1):
+					if(region_groups[regions][i] == region_groups[regions][j]):
+						fitness_score[regions] -= 10
+					if(region_groups[regions][i] != region_groups[regions][j]):
+						fitness_score[regions] += 10
+	return fitness_score
+	
