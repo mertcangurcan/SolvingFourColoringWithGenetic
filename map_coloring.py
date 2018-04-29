@@ -140,7 +140,7 @@ for i in range(num_of_steps):
 	# randomly mutation
 	mutation(region_groups, mutation_chance)
 	region_groups = region_groups[:100]	
-#	print("{0}. Step".format(i))
+	print("{0}. Step".format(i))
 print(neighborhood)
 draw_regions(region_groups[sorted_indexes[0]], neighborhood)
 
