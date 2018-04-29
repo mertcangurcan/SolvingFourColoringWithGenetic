@@ -11,6 +11,7 @@ def initiate_population():
 	adjacency_matrix = np.random.randint(0,2,(num_of_regions,num_of_regions))
 	np.fill_diagonal(adjacency_matrix,0)
 	region_groups = create_region_groups(num_of_elements, num_of_regions)
+	adjacency_matrix =  [[0,1,1,1],[1,0,1,0],[1,1,0,0],[1,0,0,0]]
 	return region_groups, adjacency_matrix
 
 # printing all color codes for each region
@@ -47,7 +48,7 @@ def one_point_crossover(first_set, second_set):
 	return first_set, second_set
 
 # 10% chance to mutation of random set
-def mutatiton(region_groups):
+def mutation(region_groups):
 	mutation_delimiter = 10
 	mutation_chance = np.random.randint(0, 100)
 	if mutation_delimiter <= mutation_chance:
@@ -78,4 +79,34 @@ def uniform_crossover(first_set, second_set, delimeter):
 		if chance <= delimeter:
 			first_set[i], second_set[i] = second_set[i], first_set[i]
 	return first_set, second_set
+
+	
+region_groups, neighborhood = initiate_population()
+for i in range(5000):
+	fitness_score = []
+	for regions_set in region_groups:
+        	fitness_score.append(calculate_fitness(regions_set, neighborhood))
+	sorted_indexes = np.argsort(fitness_score)[::-1]
+
+	
+	child_1 , child_2 = one_point_crossover(region_groups[sorted_indexes[1]], region_groups[sorted_indexes[3]])
+	region_groups.append(child_1)
+	region_groups.append(child_2)
+
+	# assign and calculate fit func and add again
+	child_1, child_2 = multi_point_crossover(region_groups[sorted_indexes[4]], region_groups[sorted_indexes[6]])
+	region_groups.append(child_1)
+	region_groups.append(child_2)	
+	# assign and calculate fit func and add again
+	uniform_crossover(region_groups[sorted_indexes[0]],region_groups[sorted_indexes[2]], 25)
+	region_groups.append(child_1)
+	region_groups.append(child_2)		
+	# randomly mutation
+	mutation(region_groups)	
+	print(i)
+
+
+embed()
+
+
 
