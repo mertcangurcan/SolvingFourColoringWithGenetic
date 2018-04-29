@@ -1,17 +1,20 @@
 import random
 import numpy as np
-from IPython import embed
-
+import sys
+import matplotlib.pyplot as plt
+import networkx as nx
 
 # initilazation of first population randomly
-def initiate_population():
-	num_of_regions = 4
+def initiate_population(num_of_regions):
 	num_of_elements = 20
-	all_adjacencies = []
-	adjacency_matrix = np.random.randint(0,2,(num_of_regions,num_of_regions))
-	np.fill_diagonal(adjacency_matrix,0)
+	adjacency_matrix = [[0]*num_of_regions]*num_of_regions
 	region_groups = create_region_groups(num_of_elements, num_of_regions)
-	adjacency_matrix =  [[0,1,1,1],[1,0,1,0],[1,1,0,0],[1,0,0,0]]
+	
+	for i in range(num_of_regions):
+		for j in range(num_of_regions):
+			if i !=j:
+				adjacency_matrix[i][j] = np.random.randint(0, 2)
+				adjacency_matrix[j][i] = adjacency_matrix[j][i]
 	return region_groups, adjacency_matrix
 
 # printing all color codes for each region
@@ -48,8 +51,8 @@ def one_point_crossover(first_set, second_set):
 	return first_set, second_set
 
 # 10% chance to mutation of random set
-def mutation(region_groups):
-	mutation_delimiter = 10
+def mutation(region_groups, mutation_delimeter):
+	mutation_delimiter = 15
 	mutation_chance = np.random.randint(0, 100)
 	if mutation_delimiter <= mutation_chance:
 		random_set = np.random.randint(0,len(region_groups))
@@ -79,10 +82,35 @@ def uniform_crossover(first_set, second_set, delimeter):
 		if chance <= delimeter:
 			first_set[i], second_set[i] = second_set[i], first_set[i]
 	return first_set, second_set
-
+def draw_regions(result_node, neighborhood):
+	color_map = [None] * len(result_node)
+	np.array(color_map)
+	for i in range(len(result_node)):
+        	if result_node[i] == 0:
+                	color_map[i] = 'red'
+        	elif result_node[i] == 1:
+                	color_map[i] = 'blue'
+        	elif result_node[i] == 2:
+                	color_map[i] = 'yellow'
+        	else:
+                	color_map[i] = 'green'
+	# reordering indexes to represent regions as colors
+	for i in range(len(result_node)):
+		result_node[i] = i
 	
-region_groups, neighborhood = initiate_population()
-for i in range(5000):
+	neighborhood=np.array(neighborhood)
+	adjacency_matrix = neighborhood
+	rows, cols = np.where(adjacency_matrix == 1)
+	edges = zip(rows.tolist(), cols.tolist())
+	gr = nx.Graph()
+	gr.add_edges_from(edges)
+	nx.draw(gr, node_size=500, node_color = color_map, with_labels=True)
+	plt.show()
+
+print(sys.argv)	
+num_of_regions, num_of_steps, mutation_chance = int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3])
+region_groups, neighborhood = initiate_population(num_of_regions)
+for i in range(num_of_steps):
 	fitness_score = []
 	for regions_set in region_groups:
         	fitness_score.append(calculate_fitness(regions_set, neighborhood))
@@ -102,11 +130,9 @@ for i in range(5000):
 	region_groups.append(child_1)
 	region_groups.append(child_2)		
 	# randomly mutation
-	mutation(region_groups)	
-	print(i)
-
-
-embed()
-
-
+	mutation(region_groups, mutation_chance)
+	region_groups = region_groups[:100]	
+#	print("{0}. Step".format(i))
+print(neighborhood)
+draw_regions(region_groups[sorted_indexes[0]], neighborhood)
 
