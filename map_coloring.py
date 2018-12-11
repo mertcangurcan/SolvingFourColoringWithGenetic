@@ -11,7 +11,7 @@ color_names = ['red', 'blue', 'yellow', 'green']
 num_of_colors = len(color_names)
 num_of_regions = 10
 num_of_steps = 100
-print_steps = 10
+print_steps = 2
 
 init_population_size = 20
 mutation_chance = 10
@@ -79,37 +79,33 @@ def mutation(chromosome):
 	mutated_set[random_index] = random_color
 	return mutated_set
 
-# printing all color codes for each region
-def print_zones(region_groups):
-	for i in range (len(region_groups)):
-		for j in range (len((region_groups[0]))):
-			print("{0}.set Zone {1} color_code : {2}".format(i, j, region_groups[i][j]))
-
 # drawing regions as graphs and edges
-def draw_regions(result_node, neighborhood):
-	color_map = [None] * len(result_node)
-	np.array(color_map)
-	for i in range(len(result_node)):
-        	if result_node[i] == 0:
-                	color_map[i] = 'red'
-        	elif result_node[i] == 1:
-                	color_map[i] = 'blue'
-        	elif result_node[i] == 2:
-                	color_map[i] = 'yellow'
-        	else:
-                	color_map[i] = 'green'
-	# reordering indexes to represent regions as colors
-	for i in range(len(result_node)):
-		result_node[i] = i
-	
-	neighborhood=np.array(neighborhood)
-	adjacency_matrix = neighborhood
+def draw_regions(chromosome, neighborhood):
+	color_map = [color_names[x] for x in chromosome]	
+	adjacency_matrix = np.array(neighborhood)
 	rows, cols = np.where(adjacency_matrix == 1)
 	edges = zip(rows.tolist(), cols.tolist())
 	gr = nx.Graph()
 	gr.add_edges_from(edges)
-	nx.draw(gr, node_size=500, node_color = color_map, with_labels=True)
+	nx.draw(gr, node_size=500, node_color=color_map, with_labels=True)
 	plt.show()
+
+# drawing best fit score change through iterations
+def draw_scores(scores):
+	_, ax = plt.subplots()
+	ax.plot(list(range(num_of_steps)), scores)
+	ax.set(xlabel='Step', ylabel='Fitness Score')
+	plt.show()
+
+# eliminating non-unique chromosomes
+def select_uniques(population):
+	uniques = dict()
+	for chromo in population:
+		hashable = tuple(chromo)
+		if hashable not in uniques:
+			uniques[hashable] = chromo
+	return list(uniques.values())
+	
 
 # ----Algorithm running order----
 # 1- initiate population
@@ -122,6 +118,7 @@ argc = len(sys.argv)
 num_of_regions = int(sys.argv[1]) if argc >= 2 else num_of_regions
 num_of_steps = int(sys.argv[2]) if argc >= 3 else num_of_steps
 mutation_chance = int(sys.argv[3]) if argc >= 4 else mutation_chance
+print_steps = int(sys.argv[4]) if argc >= 5 else mutation_chance
 
 population, neighborhood = initiate_population()
 fitness_scores = []
@@ -150,6 +147,7 @@ for step in range(num_of_steps):
 			population.append(mutated)
 
 	# Step 4
+	population = select_uniques(population)
 	population.sort(key=lambda chromo:calculate_fitness(chromo, neighborhood), reverse=True)
 	population = population[:max_population_size]
 	fitness_scores.append(calculate_fitness(population[0], neighborhood))
@@ -160,4 +158,14 @@ for step in range(num_of_steps):
 		print("Found optimal solution in {0} step".format(step))
 		break
 
+best_solution = population[0]
+print("Fitness score of best solution: {0}".format(fitness_scores[-1]))
+if fitness_scores[-1] != max_possible_score:
+	print("Errors: ")
+	for i in range(num_of_regions):
+		for j in range(i+1, num_of_regions):
+			if neighborhood[i][j] == 1 and best_solution[i] == best_solution[j]:
+				print("\tRegion {0} and region {1} are connected and have same color : {2}".format(i, j, color_names[best_solution[i]]))
+
 draw_regions(population[0], neighborhood)
+draw_scores(fitness_scores)
